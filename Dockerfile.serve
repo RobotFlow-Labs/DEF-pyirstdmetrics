@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+ENV UV_LINK_MODE=copy
+WORKDIR /app
+
+RUN pip install --no-cache-dir uv
+
+COPY pyproject.toml /app/
+COPY src /app/src
+COPY configs /app/configs
+
+RUN uv pip install --system -e .
+
+EXPOSE 8710
+CMD ["uv", "run", "anima-pyirstdmetrics-serve"]

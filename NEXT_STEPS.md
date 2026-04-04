@@ -1,64 +1,94 @@
-# NEXT_STEPS — DEF-pyirstdmetrics
+# NEXT_STEPS - DEF-pyirstdmetrics
 ## Last Updated: 2026-04-04
-## Status: ENRICHED — Ready for build
-## MVP Readiness: 0%
-## Total PRDs: 8 (32 hours estimated)
-## Critical Path: PRD-001 → PRD-002 → PRD-003 → PRD-004 → PRD-005
+## Status: AUTOPILOT PASS COMPLETE (Gates 0-3.5 + scaffold start)
+## MVP Readiness: 35%
+## PRD Progress: 7/7 generated, scaffold started
 
 ---
 
-### Immediate Next Actions
-1. Install: `uv pip install pyirstdmetrics` (or clone + editable install)
-2. Verify: `python examples/test_metrics.py -v` — all tests must pass
-3. Build ANIMA evaluation harness wrapping PyIRSTDMetrics
-4. Integrate with DEF-dhif evaluation pipeline
-5. Build cross-module evaluation dashboard for Shenzhen demo
+## Autopilot Gate Report
 
-### What This Module Does
-**PyIRSTDMetrics** is a standardized evaluation toolkit for Infrared Small Target Detection (NeurIPS 2025). It provides three levels of metrics: (1) **Pixel-level** — IoU, nIoU, F1, Precision, Recall, TPR, FPR via confusion matrix with dynamic/binary thresholding; (2) **Target-level** — Probability of Detection (PD) and False Alarm Rate (FA) via 3 matching methods (basic centroid, shooting-rule, OPDC); (3) **Hybrid-level** — hIoU (Hierarchical IoU) = seg_IoU × loc_IoU with detailed error decomposition into 7 categories (seg_mrg, seg_itf, seg_pcp, loc_itf, loc_pcp, loc_m2s, loc_s2m). Pure CPU toolkit (numpy + scipy + scikit-image), no GPU needed.
+### Gate 0 - Session Recovery
+- Result: PASS
+- Findings:
+  - Git history showed only initial scaffold commit.
+  - No previous `PRD.md` / `prds/` execution state found.
+  - Existing `CLAUDE.md` had local modifications (preserved).
 
-### Key Contribution: hIoU (Hierarchical IoU)
-The paper's main innovation is hIoU = seg_IoU × loc_IoU:
-- **seg_IoU**: How well are detected targets segmented at pixel level?
-- **loc_IoU**: How many targets are correctly detected at target level?
-- **hIoU**: Single number capturing both quality dimensions
-- **Error decomposition**: Tells you exactly WHERE the model fails (interference, perception, merge, split)
+### Gate 1 - Paper Alignment
+- Result: PASS
+- Verified:
+  - Local paper: `papers/2509.16888.pdf`
+  - Paper identity: arXiv 2509.16888 ("Rethinking Evaluation of Infrared Small Target Detection")
+  - Reference implementation: `repositories/PyIRSTDMetrics/`
+  - Key protocol values extracted from paper:
+    - threshold=0.5
+    - distance threshold=3
+    - OPDC overlap threshold=0.5
 
-### TODO (by PRD)
-- [ ] **PRD-001**: Installation + verification (2h)
-- [ ] **PRD-002**: ANIMA evaluation harness (5h)
-- [ ] **PRD-003**: DEF-dhif integration (4h)
-- [ ] **PRD-004**: Cross-module evaluation dashboard (5h)
-- [ ] **PRD-005**: Metric computation optimization (4h)
-- [ ] **PRD-006**: CI/CD benchmark tracking (3h)
-- [ ] **PRD-007**: Multi-dataset evaluation standardization (4h)
-- [ ] **PRD-008**: Extended metric integration — SOD + Seg + Counting (5h)
+### Gate 2 - Data Preflight
+- Result: PASS_WITH_WARNINGS
+- Environment: MAC_LOCAL (`/Volumes/AIFlowDev` detected)
+- Available now:
+  - Local sample evaluation data in `repositories/PyIRSTDMetrics/examples/test_data/`
+- Missing now:
+  - External benchmark datasets (IRSTD1k/SIRST/NUDT) in mounted shared dataset roots
+- Impact:
+  - Does not block toolkit scaffold
+  - Blocks full cross-dataset benchmark replication
 
-### Blockers
-- **None for installation** — PyPI package available (`pip install pyirstdmetrics`)
-- **DEF-dhif dependency**: Integration (PRD-003) requires DEF-dhif to have trained models. Can build harness in parallel.
-- **Dashboard design**: Need to decide on presentation format for Shenzhen demo
+### Gate 3 - Infra Check
+- Result: PASS_AFTER_REMEDIATION
+- Created missing foundation artifacts:
+  - `pyproject.toml`
+  - `src/anima_pyirstdmetrics/`
+  - `configs/`
+  - `scripts/`
+  - `tests/`
+  - `anima_module.yaml`
+  - `Dockerfile.serve`
+  - `docker-compose.serve.yml`
 
-### Datasets/Models Needed
-- No datasets needed directly — this is an evaluation toolkit
-- Test data included in repo: `examples/test_data/` (pred+mask PNG pairs)
-- Will consume predictions from other modules (DEF-dhif, etc.)
-- Total: ~1MB (toolkit + test data only)
-
-### Integration Targets
-1. **DEF-dhif** — Primary: evaluate DNANet + Standard/DHiF/FDConv across NUAA-SIRST, IRSTD-1K, NUDT-SIRST-Sea
-2. **Future IRSTD modules** — Any new IRSTD detection module uses this for standardized evaluation
-3. **Cross-task comparison** — Unified evaluation dashboard across IRSTD, SOD, Segmentation, Counting
-
-### Related Modules
-- **DEF-dhif** — IRSTD detection, primary evaluation target
-- **DEF-hypsam** — RGB-T SOD, uses PySODMetrics (sibling project by same author)
-- **DEF-saap** — SAR anomaly detection, different sensor but similar small-target paradigm
-- **DEF-tuni/cmssm/rtfdnet** — RGB-T segmentation, different metrics (mIoU)
-- **DEF-rgbtcc** — RGB-T crowd counting, different metrics (GAME)
-
-### Note on Module Uniqueness
-This is the only **evaluation toolkit** module in Wave 8 (and all of ANIMA). It doesn't detect anything itself — it measures how well other modules detect. Think of it as the "calibration standard" for all IRSTD evaluation. The hIoU metric from NeurIPS 2025 provides a single, interpretable number that captures both detection quality AND segmentation quality. The error decomposition is particularly valuable for defense: it tells procurement officers exactly what kind of errors a system makes (missing targets vs false alarms vs poor segmentation).
+### Gate 3.5 - PRD Generation
+- Result: PASS
+- Generated:
+  - `ASSETS.md`
+  - `PRD.md`
+  - `prds/PRD-01..07`
+  - `tasks/INDEX.md`
+  - 21 granular task files in `tasks/PRD-*.md`
 
 ---
-*Updated 2026-04-04 by ANIMA Research Agent*
+
+## Completed in this pass
+1. Full PRD suite creation (7 PRDs + index).
+2. Full task slicing (21 tasks, dependency-ordered).
+3. Foundation scaffold implementation started:
+  - config loading
+  - pair discovery
+  - evaluator wrapper (pixel/target/hybrid metrics)
+  - CLI
+  - FastAPI service skeleton
+  - preflight scripts
+  - initial tests
+
+---
+
+## Immediate Next Actions
+1. Implement `PRD-0401` and `PRD-0402` report schema/comparison utilities.
+2. Add API validation tests (`PRD-0502`).
+3. Add CI smoke workflow (`PRD-0701`).
+4. Add ROS2 contracts and optional node wiring (`PRD-0601` onward).
+5. Bootstrap local env with Python 3.11 and local reference repo:
+  - `./scripts/bootstrap_env.sh`
+
+---
+
+## Resume Pointer
+- Next task: `tasks/PRD-0401.md`
+- Current in-progress task: `tasks/PRD-0503.md`
+- Command to continue:
+  - `uv venv .venv --python 3.11 && source .venv/bin/activate`
+  - `uv pip install -e repositories/PyIRSTDMetrics -e .`
+  - `uv run python scripts/preflight.py`
+  - then continue from `tasks/INDEX.md` top-most `NOT_STARTED`

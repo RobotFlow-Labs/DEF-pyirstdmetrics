@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling>=1.26.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "anima-pyirstdmetrics"
+version = "0.1.0"
+description = "ANIMA wrapper and evaluation harness for PyIRSTDMetrics."
+readme = "CLAUDE.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "numpy>=1.23,<2.0",
+  "pillow>=10.0.0",
+  "pyirstdmetrics>=1.0.2",
+  "pydantic>=2.8.0",
+  "pyyaml>=6.0.2",
+  "scikit-image>=0.14.1,<1.0",
+  "scipy>=1.10,<2.0",
+  "uvicorn>=0.30.0",
+]
+
+[project.scripts]
+anima-pyirstdmetrics-eval = "anima_pyirstdmetrics.cli:main"
+anima-pyirstdmetrics-serve = "anima_pyirstdmetrics.serve:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/anima_pyirstdmetrics"]

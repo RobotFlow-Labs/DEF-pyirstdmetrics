@@ -1,0 +1,11 @@
+services:
+  def-pyirstdmetrics:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    ports:
+      - "8710:8710"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8710
+    restart: unless-stopped

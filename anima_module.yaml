@@ -1,0 +1,20 @@
+name: DEF-pyirstdmetrics
+module_type: evaluation
+domain: irstd
+version: 0.1.0
+
+io:
+  inputs:
+    - name: pred_dir
+      type: path
+    - name: mask_dir
+      type: path
+  outputs:
+    - name: metrics_json
+      type: json
+
+service:
+  entrypoint: anima_pyirstdmetrics.serve:app
+  health_endpoint: /health
+  ready_endpoint: /ready
+  predict_endpoint: /predict

@@ -1,0 +1,6 @@
+[evaluation]
+# Paper-aligned defaults from Sec. 3/4/5 where applicable to evaluation.
+num_bins = 10
+threshold = 0.5
+distance_threshold = 3
+overlap_threshold = 0.5

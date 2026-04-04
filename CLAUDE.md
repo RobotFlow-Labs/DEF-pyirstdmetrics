@@ -187,3 +187,7 @@ Standardized evaluation is critical for defense procurement: customers need veri
 ## Python: >= 3.10
 ## No GPU required — CPU-only evaluation toolkit
 ## Git prefix: [DEF-pyirstdmetrics]
+
+## Reference Implementation
+Source code at: repositories/PyIRSTDMetrics/
+Read ALL files in repositories/PyIRSTDMetrics/ before building. This is the paper's reference implementation.
