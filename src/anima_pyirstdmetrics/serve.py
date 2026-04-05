@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -6,29 +7,56 @@ from pydantic import BaseModel, Field
 import uvicorn
 
 from .evaluator import evaluate_directory
+from .report import SCHEMA_VERSION, build_report
 from .types import EvalConfig
+
+MODULE_NAME = "DEF-pyirstdmetrics"
+MODULE_VERSION = "0.1.0"
+_START_TIME = time.monotonic()
 
 
 class PredictRequest(BaseModel):
-    pred_dir: str = Field(..., description="Directory containing '*-pred.png' files.")
-    mask_dir: str = Field(..., description="Directory containing '*-mask.png' files.")
+    pred_dir: str = Field(..., description="Directory containing prediction images.")
+    mask_dir: str = Field(..., description="Directory containing ground-truth masks.")
+    dataset_name: str = Field("unknown", description="Dataset identifier for report.")
     num_bins: int = 10
     threshold: float = 0.5
     distance_threshold: int = 3
     overlap_threshold: float = 0.5
 
 
-app = FastAPI(title="DEF-pyirstdmetrics Service", version="0.1.0")
+app = FastAPI(title="DEF-pyirstdmetrics Service", version=MODULE_VERSION)
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "service": "def-pyirstdmetrics"}
+    return {
+        "status": "ok",
+        "module": MODULE_NAME,
+        "uptime_s": round(time.monotonic() - _START_TIME, 1),
+    }
 
 
 @app.get("/ready")
 def ready() -> dict:
-    return {"ready": True}
+    return {
+        "ready": True,
+        "module": MODULE_NAME,
+        "version": MODULE_VERSION,
+        "schema_version": SCHEMA_VERSION,
+    }
+
+
+@app.get("/info")
+def info() -> dict:
+    return {
+        "module": MODULE_NAME,
+        "version": MODULE_VERSION,
+        "schema_version": SCHEMA_VERSION,
+        "type": "evaluation_toolkit",
+        "metrics": ["iou", "niou", "f1", "pd", "fa", "hiou_opdc"],
+        "matching_methods": ["distance_only", "shooting_rule", "opdc"],
+    }
 
 
 @app.post("/predict")
@@ -42,9 +70,16 @@ def predict(req: PredictRequest) -> dict:
         overlap_threshold=req.overlap_threshold,
     )
     try:
-        return evaluate_directory(pred_dir, mask_dir, cfg=cfg)
-    except Exception as exc:  # pragma: no cover
+        metrics = evaluate_directory(pred_dir, mask_dir, cfg=cfg)
+    except (FileNotFoundError, ValueError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return build_report(
+        metrics,
+        dataset_name=req.dataset_name,
+        config=cfg,
+        pred_dir=str(pred_dir),
+        mask_dir=str(mask_dir),
+    )
 
 
 def main() -> None:

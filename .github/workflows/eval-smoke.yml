@@ -1,0 +1,48 @@
+name: Evaluation Smoke Test
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: |
+          uv venv .venv --python python3.11
+          source .venv/bin/activate
+          uv pip install -e "repositories/PyIRSTDMetrics" -e ".[dev]"
+          uv pip install pytest httpx pytest-asyncio
+
+      - name: Run preflight
+        run: |
+          source .venv/bin/activate
+          python scripts/preflight.py
+
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          python -m pytest tests/ -v --tb=short
+
+      - name: CLI smoke test
+        run: |
+          source .venv/bin/activate
+          python -m anima_pyirstdmetrics.cli \
+            --pred-dir repositories/PyIRSTDMetrics/examples/test_data \
+            --mask-dir repositories/PyIRSTDMetrics/examples/test_data \
+            --config configs/debug.toml

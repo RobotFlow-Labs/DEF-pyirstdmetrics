@@ -1,0 +1,10 @@
+[evaluation]
+num_bins = 10
+threshold = 0.5
+distance_threshold = 3
+overlap_threshold = 0.5
+
+[ros2]
+request_topic = "/irstd_eval/request"
+result_topic = "/irstd_eval/result"
+node_name = "irstd_metrics_node"
