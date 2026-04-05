@@ -14,7 +14,7 @@ from pathlib import Path
 
 from anima_pyirstdmetrics.config import load_eval_config
 from anima_pyirstdmetrics.evaluator import evaluate_directory
-from anima_pyirstdmetrics.report import build_report, save_report, format_summary
+from anima_pyirstdmetrics.report import build_report, format_summary, save_report
 from anima_pyirstdmetrics.types import EvalConfig
 
 

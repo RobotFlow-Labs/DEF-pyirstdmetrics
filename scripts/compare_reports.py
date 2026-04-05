@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from anima_pyirstdmetrics.report import load_report, compare_reports
+from anima_pyirstdmetrics.report import compare_reports, load_report
 
 
 def main() -> None:

@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 from anima_pyirstdmetrics.report import (
@@ -9,7 +8,6 @@ from anima_pyirstdmetrics.report import (
     save_report,
 )
 from anima_pyirstdmetrics.types import EvalConfig
-
 
 SAMPLE_METRICS = {
     "num_pairs": 2,

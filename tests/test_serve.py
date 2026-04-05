@@ -1,16 +1,22 @@
+import os
 from pathlib import Path
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from anima_pyirstdmetrics.serve import app
+# Allow test paths before importing app
+os.environ.setdefault(
+    "ANIMA_ALLOWED_ROOTS",
+    f"/data,/mnt/forge-data,/tmp,{Path.cwd()}",
+)
+
+from anima_pyirstdmetrics.serve import app  # noqa: E402
 
 REF_DATA = Path("repositories/PyIRSTDMetrics/examples/test_data")
 
 
 @pytest.fixture
 def client():
-    import asyncio
     transport = ASGITransport(app=app)
     return AsyncClient(transport=transport, base_url="http://test")
 
@@ -73,4 +79,14 @@ async def test_predict_bad_dir(client) -> None:
             "pred_dir": "/nonexistent/path",
             "mask_dir": "/nonexistent/path",
         })
-    assert resp.status_code == 400
+    assert resp.status_code in (400, 403)
+
+
+@pytest.mark.asyncio
+async def test_predict_path_traversal_blocked(client) -> None:
+    async with client:
+        resp = await client.post("/predict", json={
+            "pred_dir": "/etc/passwd",
+            "mask_dir": "/etc/shadow",
+        })
+    assert resp.status_code == 403

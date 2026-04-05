@@ -9,8 +9,12 @@ from .types import EvalConfig
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="ANIMA wrapper for PyIRSTDMetrics evaluation.")
-    parser.add_argument("--pred-dir", type=Path, required=True, help="Directory with '*-pred.png' files.")
-    parser.add_argument("--mask-dir", type=Path, required=True, help="Directory with '*-mask.png' files.")
+    parser.add_argument(
+        "--pred-dir", type=Path, required=True, help="Prediction image directory.",
+    )
+    parser.add_argument(
+        "--mask-dir", type=Path, required=True, help="Ground-truth mask directory.",
+    )
     parser.add_argument("--config", type=Path, default=None, help="TOML config path.")
     parser.add_argument("--output", type=Path, default=None, help="Optional output JSON path.")
     args = parser.parse_args()

@@ -12,6 +12,7 @@ def test_create_node_without_rclpy() -> None:
         import pytest
         pytest.skip("rclpy is available — cannot test offline mode")
     import pytest
+
     from anima_pyirstdmetrics.ros2_node import create_node
     with pytest.raises(RuntimeError, match="rclpy not available"):
         create_node()

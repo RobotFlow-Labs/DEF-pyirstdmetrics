@@ -2,9 +2,9 @@ import os
 import time
 from pathlib import Path
 
+import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-import uvicorn
 
 from .evaluator import evaluate_directory
 from .report import SCHEMA_VERSION, build_report
@@ -59,10 +59,25 @@ def info() -> dict:
     }
 
 
+_DEFAULT_ROOTS = "/data,/mnt/forge-data/datasets,/tmp"
+ALLOWED_ROOTS = os.getenv("ANIMA_ALLOWED_ROOTS", _DEFAULT_ROOTS).split(",")
+
+
+def _validate_path(p: Path) -> Path:
+    """Ensure path is under an allowed root directory."""
+    resolved = p.resolve()
+    if not any(str(resolved).startswith(root) for root in ALLOWED_ROOTS):
+        raise HTTPException(
+            status_code=403,
+            detail=f"Path not under allowed roots: {ALLOWED_ROOTS}",
+        )
+    return resolved
+
+
 @app.post("/predict")
 def predict(req: PredictRequest) -> dict:
-    pred_dir = Path(req.pred_dir)
-    mask_dir = Path(req.mask_dir)
+    pred_dir = _validate_path(Path(req.pred_dir))
+    mask_dir = _validate_path(Path(req.mask_dir))
     cfg = EvalConfig(
         num_bins=req.num_bins,
         threshold=req.threshold,

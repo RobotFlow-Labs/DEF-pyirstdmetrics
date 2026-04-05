@@ -1,6 +1,6 @@
-from pathlib import Path
 import importlib
 import sys
+from pathlib import Path
 
 
 def check_path(path: Path) -> bool:

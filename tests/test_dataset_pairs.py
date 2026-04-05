@@ -2,7 +2,6 @@ from pathlib import Path
 
 from anima_pyirstdmetrics.dataset import discover_pairs, discover_pairs_from_split
 
-
 REF_DATA = Path("repositories/PyIRSTDMetrics/examples/test_data")
 NUAA_SIRST = Path("/mnt/forge-data/datasets/IRSTD/NUAA-SIRST")
 

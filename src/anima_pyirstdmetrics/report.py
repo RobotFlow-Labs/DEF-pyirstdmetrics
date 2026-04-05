@@ -1,7 +1,7 @@
 """Structured evaluation report generation and comparison."""
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from .types import EvalConfig
@@ -24,7 +24,7 @@ def build_report(
         "schema_version": SCHEMA_VERSION,
         "module": module_name,
         "dataset": dataset_name,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "config": {
             "num_bins": cfg.num_bins,
             "threshold": cfg.threshold,

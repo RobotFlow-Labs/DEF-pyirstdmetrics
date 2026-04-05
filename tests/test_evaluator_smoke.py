@@ -1,9 +1,9 @@
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 
 from anima_pyirstdmetrics.evaluator import evaluate_arrays, evaluate_directory
 from anima_pyirstdmetrics.types import EvalConfig
-
 
 REF_DATA = Path("repositories/PyIRSTDMetrics/examples/test_data")
 

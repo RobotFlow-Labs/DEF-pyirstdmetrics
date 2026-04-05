@@ -1,5 +1,5 @@
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import numpy as np
 from PIL import Image
@@ -22,15 +22,27 @@ def _build_pixel_metrics(cfg: EvalConfig) -> py_irstd_metrics.CMMetrics:
         num_bins=cfg.num_bins,
         threshold=cfg.threshold,
         metric_handlers={
-            "iou": py_irstd_metrics.IoUHandler(with_dynamic=False, with_binary=True, sample_based=False),
-            "niou": py_irstd_metrics.IoUHandler(with_dynamic=False, with_binary=True, sample_based=True),
-            "f1": py_irstd_metrics.FmeasureHandler(
-                with_dynamic=False, with_binary=True, sample_based=False, beta=1
+            "iou": py_irstd_metrics.IoUHandler(
+                with_dynamic=False, with_binary=True, sample_based=False,
             ),
-            "pre": py_irstd_metrics.PrecisionHandler(with_dynamic=True, with_binary=False, sample_based=False),
-            "rec": py_irstd_metrics.RecallHandler(with_dynamic=True, with_binary=False, sample_based=False),
-            "tpr": py_irstd_metrics.TPRHandler(with_dynamic=True, with_binary=False, sample_based=False),
-            "fpr": py_irstd_metrics.FPRHandler(with_dynamic=True, with_binary=False, sample_based=False),
+            "niou": py_irstd_metrics.IoUHandler(
+                with_dynamic=False, with_binary=True, sample_based=True,
+            ),
+            "f1": py_irstd_metrics.FmeasureHandler(
+                with_dynamic=False, with_binary=True, sample_based=False, beta=1,
+            ),
+            "pre": py_irstd_metrics.PrecisionHandler(
+                with_dynamic=True, with_binary=False, sample_based=False,
+            ),
+            "rec": py_irstd_metrics.RecallHandler(
+                with_dynamic=True, with_binary=False, sample_based=False,
+            ),
+            "tpr": py_irstd_metrics.TPRHandler(
+                with_dynamic=True, with_binary=False, sample_based=False,
+            ),
+            "fpr": py_irstd_metrics.FPRHandler(
+                with_dynamic=True, with_binary=False, sample_based=False,
+            ),
         },
     )
 
@@ -66,11 +78,6 @@ def _threshold_index(num_bins: int, threshold: float) -> int:
         return 0
     bins = np.linspace(0, 1, num_bins, endpoint=False)
     return int(np.argmin(np.abs(bins - threshold)))
-
-
-def _safe_mean(arr: np.ndarray) -> float:
-    """Return mean of array, or 0.0 if empty."""
-    return float(arr.mean()) if arr.size > 0 else 0.0
 
 
 def _prepare_input(
@@ -177,7 +184,9 @@ def evaluate_directory(pred_dir: Path, mask_dir: Path, cfg: EvalConfig | None = 
     cfg = cfg or EvalConfig()
     pairs = discover_pairs(pred_dir, mask_dir)
     if not pairs:
-        raise ValueError(f"No matched '*-pred.png' and '*-mask.png' files found in {pred_dir} / {mask_dir}")
+        raise ValueError(
+            f"No matched image files found in {pred_dir} / {mask_dir}"
+        )
 
     pixel_metrics = _build_pixel_metrics(cfg)
     basic, shoot, dist, opdc, hiou_err = _build_target_metrics(cfg)

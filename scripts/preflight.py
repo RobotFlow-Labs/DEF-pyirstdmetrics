@@ -4,7 +4,6 @@
 import sys
 from pathlib import Path
 
-
 REQUIRED_FILES = [
     "pyproject.toml",
     "ASSETS.md",
@@ -63,7 +62,7 @@ def check_smoke() -> int:
         print("  [SKIP] Reference test data not found")
         return 0
     try:
-        from anima_pyirstdmetrics import evaluate_directory, EvalConfig
+        from anima_pyirstdmetrics import EvalConfig, evaluate_directory
         result = evaluate_directory(ref_data, ref_data, cfg=EvalConfig(num_bins=1))
         pairs = result.get("num_pairs", 0)
         iou = result.get("pixel_level", {}).get("iou", 0)
