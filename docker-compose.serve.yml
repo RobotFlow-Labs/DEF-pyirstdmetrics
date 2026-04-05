@@ -8,4 +8,21 @@ services:
     environment:
       - HOST=0.0.0.0
       - PORT=8710
+    volumes:
+      - /mnt/forge-data/datasets:/data/datasets:ro
+      - /mnt/artifacts-datai/reports:/data/reports
     restart: unless-stopped
+    profiles:
+      - serve
+      - api
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    command: python -m pytest tests/ -v --tb=short
+    volumes:
+      - ./tests:/app/tests:ro
+      - ./repositories:/app/repositories:ro
+    profiles:
+      - test

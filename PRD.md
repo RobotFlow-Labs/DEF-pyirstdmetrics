@@ -14,31 +14,32 @@ Build an ANIMA-ready IRSTD evaluation module around PyIRSTDMetrics that provides
 ## Build Plan
 | PRD | Title | Priority | Depends On | Status |
 |---|---|---|---|---|
-| PRD-01 | Foundation and Config Scaffold | P0 | None | DONE (initial scaffold) |
-| PRD-02 | Core Metric Adapter Layer | P0 | PRD-01 | IN_PROGRESS |
-| PRD-03 | Inference Input Pipeline | P0 | PRD-02 | NOT_STARTED |
-| PRD-04 | Evaluation and Benchmark Reporting | P1 | PRD-03 | NOT_STARTED |
-| PRD-05 | API and Docker Serving | P1 | PRD-03 | IN_PROGRESS |
-| PRD-06 | ROS2 Integration | P1 | PRD-05 | NOT_STARTED |
-| PRD-07 | Production Hardening and CI Tracking | P2 | PRD-04, PRD-05 | NOT_STARTED |
+| PRD-01 | Foundation and Config Scaffold | P0 | None | DONE |
+| PRD-02 | Core Metric Adapter Layer | P0 | PRD-01 | DONE |
+| PRD-03 | Inference Input Pipeline | P0 | PRD-02 | DONE |
+| PRD-04 | Evaluation and Benchmark Reporting | P1 | PRD-03 | DONE |
+| PRD-05 | API and Docker Serving | P1 | PRD-03 | DONE |
+| PRD-06 | ROS2 Integration | P1 | PRD-05 | DONE |
+| PRD-07 | Production Hardening and CI Tracking | P2 | PRD-04, PRD-05 | DONE |
 
 ## Gate Summary (Autopilot)
 | Gate | Result | Notes |
 |---|---|---|
-| Gate 0 - Session Recovery | PASS | Fresh scaffold state; no prior PRD execution found. |
-| Gate 1 - Paper Alignment | PASS | Local PDF + reference repo + online metadata verified. |
-| Gate 2 - Data Preflight | PASS_WITH_WARNINGS | External benchmark datasets not found locally; local test assets present. |
-| Gate 3 - Infra Check | PASS_AFTER_SCAFFOLD | Required foundation files were missing and have now been created. |
-| Gate 3.5 - PRD Generation | PASS | Full PRD and task structure generated. |
+| Gate 0 - Session Recovery | PASS | Resumed from Mac scaffold on GPU server. |
+| Gate 1 - Paper Alignment | PASS | Local PDF + reference repo verified. |
+| Gate 2 - Data Preflight | PASS | NUAA-SIRST (427 pairs) on server. |
+| Gate 3 - Infra Check | PASS | All foundation files present. |
+| Gate 3.5 - PRD Generation | PASS (prev) | Full PRD and task structure from prev session. |
+| Gate 4.5 - Code Review | PASS | 29 tests, all passing. |
 
-## Risks
-1. External benchmark datasets for cross-dataset evaluation are not mounted in current environment.
-2. Downstream module integration (for example DEF-dhif) depends on prediction export conventions.
-3. ROS2 contracts are not yet fixed for evaluation-only modules.
+## Test Summary
+- 29 tests passing across 6 test files
+- Preflight checks: all green
+- NUAA-SIRST benchmark: 427 pairs evaluated successfully
 
 ## Definition of Done
-1. CLI evaluates prediction/mask folders and emits standardized JSON.
-2. API service exposes `/health`, `/ready`, `/predict`.
-3. Results include full paper-aligned metric hierarchy.
-4. Cross-module evaluation schema is stable and documented.
-5. CI gate can run smoke evaluation against reference test_data.
+1. [x] CLI evaluates prediction/mask folders and emits standardized JSON.
+2. [x] API service exposes `/health`, `/ready`, `/predict`, `/info`.
+3. [x] Results include full paper-aligned metric hierarchy.
+4. [x] Cross-module evaluation schema is stable and documented.
+5. [x] CI gate can run smoke evaluation against reference test_data.

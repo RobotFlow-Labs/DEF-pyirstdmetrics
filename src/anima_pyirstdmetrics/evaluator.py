@@ -163,8 +163,12 @@ def evaluate_arrays(pred: np.ndarray, mask: np.ndarray, cfg: EvalConfig | None =
 
 
 def _load_pair(pred_path: Path, mask_path: Path) -> tuple[np.ndarray, np.ndarray]:
-    pred = np.asarray(Image.open(pred_path).convert("L"), dtype=np.float64) / 255.0
-    mask = np.asarray(Image.open(mask_path).convert("L")) > 127
+    pred_img = Image.open(pred_path).convert("L")
+    mask_img = Image.open(mask_path).convert("L")
+    if pred_img.size != mask_img.size:
+        mask_img = mask_img.resize(pred_img.size, Image.NEAREST)
+    pred = np.asarray(pred_img, dtype=np.float64) / 255.0
+    mask = np.asarray(mask_img) > 127
     return pred, mask
 
 

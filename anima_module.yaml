@@ -2,19 +2,41 @@ name: DEF-pyirstdmetrics
 module_type: evaluation
 domain: irstd
 version: 0.1.0
+description: Standardized IRSTD evaluation toolkit — pixel, target, and hybrid metrics
+paper: "Rethinking Evaluation of Infrared Small Target Detection (NeurIPS 2025)"
+arxiv: "2509.16888"
+
+capabilities:
+  - pixel_level_metrics    # IoU, nIoU, F1, Precision, Recall, TPR, FPR
+  - target_level_metrics   # PD/FA (distance-only, shooting-rule, OPDC)
+  - hybrid_level_metrics   # hIoU with hierarchical error decomposition
+  - report_generation      # Versioned JSON reports with provenance
+  - report_comparison      # Side-by-side metric comparison
 
 io:
   inputs:
     - name: pred_dir
       type: path
+      description: Directory with prediction images
     - name: mask_dir
       type: path
+      description: Directory with ground-truth masks
   outputs:
     - name: metrics_json
       type: json
+      description: Full metric hierarchy with provenance
 
 service:
   entrypoint: anima_pyirstdmetrics.serve:app
+  port: 8710
   health_endpoint: /health
   ready_endpoint: /ready
   predict_endpoint: /predict
+  info_endpoint: /info
+
+docker:
+  image: def-pyirstdmetrics
+  dockerfile: Dockerfile.serve
+  compose: docker-compose.serve.yml
+
+gpu_required: false
