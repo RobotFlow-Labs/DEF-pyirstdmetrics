@@ -4,10 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile.serve
     ports:
-      - "8710:8710"
-    environment:
-      - HOST=0.0.0.0
-      - PORT=8710
+      - "${ANIMA_SERVE_PORT:-8710}:${ANIMA_SERVE_PORT:-8710}"
+    env_file:
+      - .env.serve
     volumes:
       - /mnt/forge-data/datasets:/data/datasets:ro
       - /mnt/artifacts-datai/reports:/data/reports
@@ -15,6 +14,19 @@ services:
     profiles:
       - serve
       - api
+
+  ros2:
+    build:
+      context: .
+      dockerfile: Dockerfile.serve
+    env_file:
+      - .env.serve
+    network_mode: host
+    command: >
+      python -c "from anima_pyirstdmetrics.ros2_node import create_node;
+      n = create_node(); n.spin()"
+    profiles:
+      - ros2
 
   test:
     build:

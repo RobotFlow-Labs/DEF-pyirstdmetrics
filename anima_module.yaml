@@ -1,19 +1,33 @@
-name: DEF-pyirstdmetrics
-module_type: evaluation
-domain: irstd
-version: 0.1.0
-description: Standardized IRSTD evaluation toolkit — pixel, target, and hybrid metrics
-paper: "Rethinking Evaluation of Infrared Small Target Detection (NeurIPS 2025)"
-arxiv: "2509.16888"
+schema_version: '1.0'
+module:
+  name: def-pyirstdmetrics
+  version: 0.1.0
+  display_name: DEF-pyirstdmetrics
+  description: >-
+    Standardized IRSTD evaluation toolkit — pixel-level (IoU, nIoU, F1),
+    target-level (PD/FA via OPDC matching), and hybrid-level (hIoU with
+    hierarchical error decomposition) metrics.
+  category: defense.evaluation
+  license: Apache-2.0
+  paper: "Rethinking Evaluation of Infrared Small Target Detection (NeurIPS 2025)"
+  arxiv: "2509.16888"
+  module_type: evaluation
+  domain: irstd
 
 capabilities:
-  - pixel_level_metrics    # IoU, nIoU, F1, Precision, Recall, TPR, FPR
-  - target_level_metrics   # PD/FA (distance-only, shooting-rule, OPDC)
-  - hybrid_level_metrics   # hIoU with hierarchical error decomposition
-  - report_generation      # Versioned JSON reports with provenance
-  - report_comparison      # Side-by-side metric comparison
+  provides:
+    - type: evaluation
+      subtype: irstd_metrics
+    - type: evaluation
+      subtype: pixel_level
+    - type: evaluation
+      subtype: target_level
+    - type: evaluation
+      subtype: hybrid_hiou
+    - type: report
+      subtype: benchmark_comparison
 
-io:
+interface:
   inputs:
     - name: pred_dir
       type: path
@@ -26,6 +40,14 @@ io:
       type: json
       description: Full metric hierarchy with provenance
 
+hardware:
+  platforms:
+    - name: x86_64
+      backends: [cpu]
+    - name: aarch64
+      backends: [cpu]
+  gpu_required: false
+
 service:
   entrypoint: anima_pyirstdmetrics.serve:app
   port: 8710
@@ -35,8 +57,28 @@ service:
   info_endpoint: /info
 
 docker:
-  image: def-pyirstdmetrics
+  image: ghcr.io/robotflow-labs/anima-def-pyirstdmetrics:0.1.0
   dockerfile: Dockerfile.serve
   compose: docker-compose.serve.yml
+  port: 8710
 
-gpu_required: false
+ros2:
+  node_name: irstd_metrics_node
+  launch_file: launch/irstd_metrics.launch.py
+  topics:
+    subscribe:
+      - name: /irstd_eval/request
+        type: std_msgs/String
+    publish:
+      - name: /irstd_eval/result
+        type: std_msgs/String
+
+composability:
+  pairs_well_with:
+    - def-dhif
+  conflicts_with: []
+
+safety:
+  failure_mode: returns_error
+  timeout_ms: 30000
+  health_topic: /anima/def_pyirstdmetrics/health

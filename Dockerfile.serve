@@ -1,6 +1,12 @@
+# Layer 3: DEF-pyirstdmetrics (evaluation toolkit — CPU only)
+# No GPU, no model weights — pure metric computation
 FROM python:3.11-slim
 
-ENV UV_LINK_MODE=copy
+ENV UV_LINK_MODE=copy \
+    ANIMA_MODULE_NAME=def-pyirstdmetrics \
+    ANIMA_MODULE_VERSION=0.1.0 \
+    ANIMA_SERVE_PORT=8710
+
 WORKDIR /app
 
 RUN pip install --no-cache-dir uv
@@ -8,11 +14,16 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml /app/
 COPY src /app/src
 COPY configs /app/configs
+COPY launch /app/launch
 COPY repositories/PyIRSTDMetrics /app/repositories/PyIRSTDMetrics
 
 RUN uv pip install --system -e ./repositories/PyIRSTDMetrics -e .
 
 EXPOSE 8710
+
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8710/health')" || exit 1
+    CMD python -c \
+    "import urllib.request; urllib.request.urlopen('http://localhost:8710/health')" \
+    || exit 1
+
 CMD ["python", "-m", "anima_pyirstdmetrics.serve"]
